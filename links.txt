@@ -1,0 +1,10 @@
+https://docs.google.com/spreadsheets/d/11xqWNx3Ig2Kck-iQgaf3TW5DxBVkg_UkmliVVXeWRUg/edit#gid=0
+
+https://www.cs.put.poznan.pl/csobaniec/edu/tiwpr/doc/projekty.html
+
+https://www.youtube.com/watch?v=GMppyAPbLYk
+
+https://flask-restful.readthedocs.io/en/latest/quickstart.html
+
+https://stackoverflow.com/questions/55543011/flask-restful-pagination
+https://github.com/flask-restful/flask-restful/issues/84
