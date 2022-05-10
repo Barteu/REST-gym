@@ -11,3 +11,4 @@ def hash_tup(tup):
 
     hash_object  = hashlib.md5(string.encode())
     return hash_object.hexdigest()
+

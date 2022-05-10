@@ -3,8 +3,11 @@ from flask_restful import Api
 
 from gym_app.extensions import db
 
-from gym_app.resources.todo import Todo, TodoList
-from gym_app.resources.gym import Gym, GymList
+from gym_app.resources.gym import Gym, GymList, GymCleanup
+from gym_app.resources.gym_membership import GymMembership, GymMembershipList
+from gym_app.resources.user import User, UserList
+from gym_app.resources.equipment import Equipment, EquipmentList
+from gym_app.resources.equipment_affiliation import EquipmentAffiliation, EquipmentAffiliationList
 
 def create_app():
     app = Flask(__name__)
@@ -24,10 +27,22 @@ api = Api(app)
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(TodoList, '/todos')
-api.add_resource(Todo, '/todos/<todo_id>')
+
 api.add_resource(GymList, '/gyms')
 api.add_resource(Gym, '/gyms/<gym_id>')
+api.add_resource(GymCleanup, '/gyms/<gym_id>/cleanups')
+
+api.add_resource(UserList, '/users')
+api.add_resource(User, '/users/<user_id>')
+
+api.add_resource(GymMembershipList, '/gym-memberships')
+api.add_resource(GymMembership, '/gym-memberships/<gym_membership_id>')
+
+api.add_resource(EquipmentList, '/equipments')
+api.add_resource(Equipment, '/equipments/<equipment_id>')
+
+api.add_resource(EquipmentAffiliationList, '/equipment-affiliations')
+api.add_resource(EquipmentAffiliation, '/equipment-affiliations/<id>')
 
 
 from gym_app import models
