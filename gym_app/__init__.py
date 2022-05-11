@@ -8,6 +8,7 @@ from gym_app.resources.gym_membership import GymMembership, GymMembershipList
 from gym_app.resources.user import User, UserList
 from gym_app.resources.equipment import Equipment, EquipmentList
 from gym_app.resources.equipment_affiliation import EquipmentAffiliation, EquipmentAffiliationList
+from gym_app.resources.equipment_transfer import EquipmentTransfer
 
 def create_app():
     app = Flask(__name__)
@@ -21,7 +22,6 @@ def create_app():
 
 
 app = create_app()
-
 api = Api(app)
 
 ##
@@ -43,6 +43,8 @@ api.add_resource(Equipment, '/equipments/<equipment_id>')
 
 api.add_resource(EquipmentAffiliationList, '/equipment-affiliations')
 api.add_resource(EquipmentAffiliation, '/equipment-affiliations/<id>')
+
+api.add_resource(EquipmentTransfer, '/equipment-transfers')
 
 
 from gym_app import models

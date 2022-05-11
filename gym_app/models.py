@@ -127,11 +127,10 @@ class EquipmentModel(db.Model):
         return f'<Equipment: {self.id} {self.name} clean: {self.is_clean}>'
 
     def get_hash(self):
-        return hash_tup((self.id, self.name, self.is_clean, self.gym))
+        return hash_tup((self.id, self.name, self.is_clean))
 
     def check_completeness(self):
-        if self.name != None\
-             and self.gym != None:
+        if self.name != None:
             self.is_created = True
             return True
         else:

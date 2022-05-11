@@ -1,13 +1,14 @@
 from flask import Flask, request
 from flask_restful import reqparse, abort, Api, Resource, url_for
-from gym_app.models import EquipmentAffiliationModel
+from gym_app.models import EquipmentAffiliationModel, GymModel, EquipmentModel
 from gym_app import db
 from flask import jsonify, make_response
+from gym_app.resources.gym import Gym
 from gym_app.utils import abort_if_limit_or_offset_is_bad, abort_if_etag_doesnt_match
 
 parser = reqparse.RequestParser()
-parser.add_argument('equipment_id')
-parser.add_argument('gym_id')
+parser.add_argument('equipment_id', type=int)
+parser.add_argument('gym_id', type=int)
 parser.add_argument('If-None-Match', location='headers')
 
 
@@ -37,10 +38,18 @@ class EquipmentAffiliation(Resource):
       
         abort_if_etag_doesnt_match(args['If-None-Match'], equipment_affiliation.get_hash())
 
-        if args['equipment_id'] is not None:
-            equipment_affiliation.equipment_id = args['equipment_id']
-        if args['gym_id'] is not None:
-            equipment_affiliation.gym_id = args['gym_id']
+        try:
+            if args['equipment_id'] is not None:
+                if EquipmentModel.query.filter(EquipmentModel.id == int(args['equipment_id'])).first() is None:
+                    raise Exception()
+                equipment_affiliation.equipment_id = args['equipment_id']
+            if args['gym_id'] is not None:
+                if GymModel.query.filter(GymModel.id == int(args['gym_id'])).first() is None:
+                    raise Exception()
+                equipment_affiliation.gym_id = args['gym_id']
+        except:
+            abort(400, message="Bad data format")
+       
         try:
             equipment_affiliation.check_completeness()
             db.session.commit()
@@ -58,10 +67,13 @@ class EquipmentAffiliation(Resource):
 
         abort_if_etag_doesnt_match(args['If-None-Match'], equipment_affiliation.get_hash())
 
-        if args['equipment_id'] is not None:
-            equipment_affiliation.equipment_id = args['equipment_id']
-        if args['gym_id'] is not None:
-            equipment_affiliation.gym_id = args['gym_id']
+        try:
+            if args['equipment_id'] is not None:
+                equipment_affiliation.equipment_id = args['equipment_id']
+            if args['gym_id'] is not None:
+                equipment_affiliation.gym_id = args['gym_id']
+        except:
+            abort(400, message="Bad data format")
         try:
             equipment_affiliation.check_completeness()
             db.session.commit()
@@ -127,7 +139,7 @@ class EquipmentAffiliationList(Resource):
             abort(404, message="Somethig went wrong")
 
         res_body = {
-            'URL': url_for('equipmentaffiliation', equipment_affiliation_id=equipment_affiliation.id),
+            'URL': url_for('equipmentaffiliation', id=equipment_affiliation.id),
             'ETag':  equipment_affiliation.get_hash()
         }
 

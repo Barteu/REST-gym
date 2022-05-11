@@ -38,12 +38,16 @@ class User(Resource):
       
         abort_if_etag_doesnt_match(args['If-None-Match'], user.get_hash())
 
-        if args['first_name'] is not None:
-            user.first_name = args['first_name']
-        if args['last_name'] is not None:
-            user.last_name = args['last_name']
-        if args['birth_year'] is not None:
-            user.birth_year = args['birth_year']
+        try:
+            if args['first_name'] is not None:
+                user.first_name = args['first_name']
+            if args['last_name'] is not None:
+                user.last_name = args['last_name']
+            if args['birth_year'] is not None:
+                user.birth_year = int(args['birth_year'])
+        except:
+            abort(400, message="Bad data format")
+        
         try:
             user.check_completeness()
             db.session.commit()
@@ -61,12 +65,11 @@ class User(Resource):
 
         abort_if_etag_doesnt_match(args['If-None-Match'], user.get_hash())
 
-        if args['first_name'] is not None:
-            user.first_name = args['first_name']
-        if args['last_name'] is not None:
+        try:
             user.last_name = args['last_name']
-        if args['birth_year'] is not None:
-            user.birth_year = args['birth_year']
+        except:
+            abort(400, message="Bad data format")           
+   
         try:
             user.check_completeness()
             db.session.commit()

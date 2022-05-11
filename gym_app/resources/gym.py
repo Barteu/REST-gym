@@ -39,10 +39,14 @@ class Gym(Resource):
       
         abort_if_etag_doesnt_match(args['If-None-Match'], gym.get_hash())
 
-        if args['name'] is not None:
-            gym.name = args['name']
-        if args['location'] is not None:
-            gym.location = args['location']
+        try:
+            if args['name'] is not None:
+                gym.name = args['name']
+            if args['location'] is not None:
+                gym.location = args['location']
+        except:
+            abort(400, message="Bad data format")
+
         try:
             gym.check_completeness()
             db.session.commit()
@@ -60,10 +64,11 @@ class Gym(Resource):
 
         abort_if_etag_doesnt_match(args['If-None-Match'], gym.get_hash())
 
-        if args['name'] is not None:
-            gym.name = args['name']
-        if args['location'] is not None:
+        try:
             gym.location = args['location']
+        except:
+            abort(400, message="Bad data format")
+
         try:
             gym.check_completeness()
             db.session.commit()

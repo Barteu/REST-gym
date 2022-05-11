@@ -1,3 +1,4 @@
+from tempfile import TemporaryFile
 from flask import Flask, request
 from flask_restful import reqparse, abort, Api, Resource, url_for
 from gym_app.models import EquipmentModel
@@ -7,7 +8,7 @@ from gym_app.utils import abort_if_limit_or_offset_is_bad, abort_if_etag_doesnt_
 
 parser = reqparse.RequestParser()
 parser.add_argument('name')
-parser.add_argument('is_clean')
+parser.add_argument('is_clean', type=bool)
 parser.add_argument('If-None-Match', location='headers')
 
 
@@ -37,10 +38,15 @@ class Equipment(Resource):
       
         abort_if_etag_doesnt_match(args['If-None-Match'], equipment.get_hash())
 
-        if args['name'] is not None:
-            equipment.name = args['name']
-        if args['is_clean'] is not None:
-            equipment.is_clean = args['is_clean']
+        try:
+            if args['name'] is not None:
+                equipment.name = args['name']
+            if args['is_clean'] is not None:
+                equipment.is_clean = args['is_clean']
+        except:
+            abort(400, message="Bad data format")
+
+      
         try:
             equipment.check_completeness()
             db.session.commit()
@@ -58,11 +64,13 @@ class Equipment(Resource):
 
         abort_if_etag_doesnt_match(args['If-None-Match'], equipment.get_hash())
 
-        if args['name'] is not None:
-            equipment.name = args['name']
-        if args['is_clean'] is not None:
-            equipment.is_clean = args['is_clean']
         try:
+            equipment.is_clean = args['is_clean']
+        except:
+            abort(400, message="Bad data format")
+
+        try:
+         
             equipment.check_completeness()
             db.session.commit()
         except:

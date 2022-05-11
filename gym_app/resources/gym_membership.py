@@ -1,13 +1,15 @@
 import datetime as dt
 from flask import Flask, request
+from itsdangerous import NoneAlgorithm
 from flask_restful import reqparse, abort, Api, Resource, url_for
-from gym_app.models import GymMembershipModel
+from gym_app.models import GymMembershipModel, UserModel, GymModel
 from gym_app import db
 from flask import jsonify, make_response
+from gym_app.resources.gym import Gym
 from gym_app.utils import abort_if_limit_or_offset_is_bad, abort_if_etag_doesnt_match
 
 parser = reqparse.RequestParser()
-parser.add_argument('entries')
+parser.add_argument('entries', type=int)
 parser.add_argument('user_id')
 parser.add_argument('gym_id')
 parser.add_argument('If-None-Match', location='headers')
@@ -39,12 +41,22 @@ class GymMembership(Resource):
       
         abort_if_etag_doesnt_match(args['If-None-Match'], gym_membership.get_hash())
 
-        if args['entries'] is not None:
-            gym_membership.entries = args['entries']
-        if args['user_id'] is not None:
-            gym_membership.user_id = args['user_id']
-        if args['gym_id'] is not None:
-            gym_membership.gym_id = args['gym_id']
+        try:
+            if args['entries'] is not None:
+                gym_membership.entries = args['entries']
+            if args['user_id'] is not None:
+                if UserModel.query.filter(UserModel.id == int(args['user_id'])).first() is not None:
+                    gym_membership.user_id = int(args['user_id'])
+                else:
+                    raise Exception()
+            if args['gym_id'] is not None:
+                if GymModel.query.filter(GymModel.id == int(args['gym_id'])).first() is not None:
+                    gym_membership.gym_id = args['gym_id']
+                else:
+                    raise Exception()
+        except:
+            abort(400, message="Bad data format")
+
         try:
             gym_membership.check_completeness()
             db.session.commit()
@@ -62,12 +74,11 @@ class GymMembership(Resource):
 
         abort_if_etag_doesnt_match(args['If-None-Match'], gym_membership.get_hash())
 
-        if args['entries'] is not None:
+        try:
             gym_membership.entries = args['entries']
-        if args['user_id'] is not None:
-            gym_membership.user_id = args['user_id']
-        if args['gym_id'] is not None:
-            gym_membership.gym_id = args['gym_id']
+        except:
+            abort(400, message="Bad data format")
+
         try:
             gym_membership.check_completeness()
             db.session.commit()
@@ -127,14 +138,26 @@ class GymMembershipList(Resource):
         gym_membership = GymMembershipModel() 
 
         args = parser.parse_args()
-        if args['entries'] is not None:
-            gym_membership.entries = args['entries']
-        if args['user_id'] is not None:
-            gym_membership.user_id = args['user_id']
-        if args['gym_id'] is not None:
-            gym_membership.gym_id = args['gym_id']
+
+        try:
+            if args['entries'] is not None:
+                gym_membership.entries = args['entries']
+            if args['user_id'] is not None:
+                if UserModel.query.filter(UserModel.id == int(args['user_id'])).first() is not None:
+                    gym_membership.user_id = int(args['user_id'])
+                else:
+                    raise Exception()
+            if args['gym_id'] is not None:
+                if GymModel.query.filter(GymModel.id == int(args['gym_id'])).first() is not None:
+                    gym_membership.gym_id = args['gym_id']
+                else:
+                    raise Exception()
+        except:
+            abort(400, message="Bad data format")
+
         gym_membership.creation_date = dt.date.today()
-        gym_membership.check_completeness()
+        if gym_membership.check_completeness() is False:
+            abort(400, message="All fields must be given")
 
         try:
             db.session.add(gym_membership)    
