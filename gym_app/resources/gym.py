@@ -118,6 +118,11 @@ class GymList(Resource):
             limit = int(args['limit'])
             offset = int(args['offset'])
 
+
+            response.headers['Link'] ='<'+url_for('gymlist')+f'?limit={limit}&offset={offset+limit if paginate_result.total>=offset+limit else offset}'\
+                +'>;rel=next,<'+\
+                    url_for('gymlist')+f'?limit={limit}&offset={max(offset-limit,0)}'+'>;rel=previous'
+
             response.headers['next'] = url_for('gymlist')+f'?limit={limit}&offset={offset+limit if paginate_result.total>=offset+limit else offset}'
             response.headers['prev'] = url_for('gymlist')+f'?limit={limit}&offset={max(offset-limit,0)}'
             response.headers['results'] = paginate_result.total

@@ -138,8 +138,10 @@ class UserList(Resource):
             'URL': url_for('user', user_id=user.id),
             'ETag':  user.get_hash()
         }
+        
 
         response = make_response(jsonify(res_body))
+        response.headers['location'] = url_for('user', user_id=user.id)
         response.status_code = 201
 
         return response

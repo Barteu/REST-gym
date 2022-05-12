@@ -9,5 +9,7 @@ def abort_if_limit_or_offset_is_bad(args):
 
 
 def abort_if_etag_doesnt_match(etag, res_etag):
-    if etag is None or res_etag != etag.replace('"',''):
+    if etag is None:
+        abort(428, message="ETag is needed")
+    if  res_etag != etag.replace('"',''):
         abort(412, message="ETag doesn't match")
